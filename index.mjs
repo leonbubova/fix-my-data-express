@@ -1,12 +1,15 @@
 import express from 'express'
 import OpenAI from "openai";
 import cors from 'cors'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const app = express()
 const port = process.env.PORT || 3010
 
 const corsOptions ={
-    origin:'http://localhost:3005',
+    origin:'*',
     credentials:true,            //access-control-allow-credentials:true
     optionSuccessStatus:200
 }
