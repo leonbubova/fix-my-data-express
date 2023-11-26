@@ -37,3 +37,4 @@ jobs:
             docker stop fix-my-data-api || true
             docker rm fix-my-data-api || true
             docker run --restart unless-stopped -d --pull=always -p 3010:3010 --name fix-my-data-api leonbubova/fix-my-data:latest
+            docker image prune -af
