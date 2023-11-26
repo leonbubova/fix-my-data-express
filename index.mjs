@@ -2,19 +2,50 @@ import express from 'express'
 import OpenAI from "openai";
 import cors from 'cors'
 import dotenv from 'dotenv'
+import bodyParser from 'body-parser'
+
 
 dotenv.config()
 
 const app = express()
 const port = process.env.PORT || 3010
 
-const corsOptions ={
-    origin:'*',
-    credentials:true,            //access-control-allow-credentials:true
-    optionSuccessStatus:200
+// parse application/json
+app.use(bodyParser.json())
+
+const corsOptions = {
+  origin: '*',
+  credentials: true,            //access-control-allow-credentials:true
+  optionSuccessStatus: 200,
+  methods: ['GET', 'POST']
 }
 app.use(cors(corsOptions));
-const callOpenAI = async (input, output) => {
+
+
+app.get('/', (req, res) => {
+  res.send('Hello World!')
+})
+
+app.post('/stream', async function (req, res) {
+  console.info('Incoming request on /stream')
+
+  // res.send(await callOpenAI('asdf, asdf, adsf', '"asdf", "asdf"'))
+  setTimeout(() => res.write('first'), 1000)
+  setTimeout(() => res.write('second'), 2000)
+  setTimeout(() => {
+    res.write('third')
+    res.end()
+  }, 3000)
+
+});
+
+app.post('/format', async function (req, res) {
+  console.info('Incoming request on /format')
+
+  const {input, output} = req.body
+
+  console.info(req.body)
+
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
@@ -37,39 +68,19 @@ const callOpenAI = async (input, output) => {
     stream: true,
   });
 
-  return completion
-}
+  for await (const chunk of completion) {
+    if (!(chunk.choices[0].finish_reason === 'stop')) {
+      const content = chunk.choices[0].delta.content;
+      res.write(content)
+      console.log(content);
+    }
+  }
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.end()
+
+
 })
 
-app.get('/stream', async function (req, res) {
-
-  // res.send(await callOpenAI('asdf, asdf, adsf', '"asdf", "asdf"'))
-  setTimeout(() => res.write('first'), 1000)
-  setTimeout(() => res.write('second'), 2000)
-  setTimeout(() => {
-    res.write('third')
-    res.end()
-  }, 3000)
-
-});
-
-var sendAndSleep = function (response, counter) {
-  if (counter > 3) {
-    response.end();
-  } else {
-    console.log("sending")
-    response.write('thought nr.:' + counter);
-    counter++;
-    setTimeout(function () {
-      sendAndSleep(response, counter);
-    }, 1000)
-  }
-  ;
-};
-
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
+  console.log(`fix-my-data-express listening on ${port}`)
 })
