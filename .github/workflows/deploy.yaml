@@ -30,10 +30,10 @@ jobs:
         with:
           host: ${{ secrets.DROPLET_IP }}
           username: ${{ secrets.DROPLET_USERNAME }}
-          key: ${{ secrets.DROPLET_SSH_KEY }}
+          password: ${{ secrets.DROPLET_SSH_KEY }}
           port: 22
           script: |
             docker pull leonbubova/fix-my-data:latest
             docker stop fix-my-data-api || true
             docker rm fix-my-data-api || true
-            docker run --restart unless-stopped -d --pull=always -p 3010:3010 leonbubova/fix-my-data:latest
+            docker run --restart unless-stopped -d --pull=always -p 3010:3010 --name fix-my-data-api leonbubova/fix-my-data:latest
