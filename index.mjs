@@ -14,7 +14,7 @@ const port = process.env.PORT || 3010
 app.use(bodyParser.json())
 
 const corsOptions = {
-  origin: '*',
+  origin: 'https://fix-my-data.vercel.app',
   credentials: true,            //access-control-allow-credentials:true
   optionSuccessStatus: 200,
   methods: ['GET', 'POST']
