@@ -22,6 +22,8 @@ jobs:
 
       - name: Build image
         run: |
+          touch .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
           docker image build . -t  leonbubova/fix-my-data:latest
           docker push leonbubova/fix-my-data:latest
 
